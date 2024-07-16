@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<mujoco xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:property name="lower" value="0.002" />
+  <xacro:property name="upper" value="0.034" />
+  <xacro:property name="gripper_eps" value="0.000" />
+
+  <xacro:macro name="pal_wsg_assets">
+    <asset>
+      <mesh name="wsg_gripper_link" file="$(find pal_wsg_gripper_description)/meshes/gripper_link.stl" />
+      <mesh name="wsg_gripper_finger_linkL" file="$(find pal_wsg_gripper_description)/meshes/gripper_finger_link.stl" />
+      <mesh name="wsg_gripper_finger_linkR" file="$(find pal_wsg_gripper_description)/meshes/gripper_finger_link.stl" scale="-1 -1 1"/>
+    </asset>
+  </xacro:macro>
+
+  <xacro:macro name="pal_wsg_gripper" params="name xyz quat" >
+    <body name="${name}_link" pos="${xyz}" quat="${quat}" >
+      <inertial mass="0.63871" pos="0.00449 -0.00004 -0.04001" fullinertia="0.00040306 0.00105906 0.00076811 -0.00000348 0.00005193 -0.00000076" />
+      <geom name="${name}_gripper" type="mesh" mesh="wsg_gripper_link" rgba="1 1 1 1" />
+
+      <body name="${name}_left_finger_link" pos="-${upper} 0. 0." quat="1 0 0 0" >
+        <inertial mass="0.06286" pos="0.03870 -0.00286 -0.10106" fullinertia="0.00004502 0.00004669 0.00001209 0.00000284 -0.0000071 -0.00000559" />
+        <joint name="${name}_finger_joint" limited="true" axis="1 0 0" type="slide" range="${lower} ${upper}" />
+        <geom name="${name}_left_finger" type="mesh" mesh="wsg_gripper_finger_linkL" rgba="0. 0. 0. 1" />
+      </body>
+
+      <body name="${name}_right_finger_link" pos="${upper} 0. 0." quat="1 0 0 0" >
+        <inertial mass="0.06286" pos="0.03870 -0.00286 -0.10106" fullinertia="0.00004502 0.00004669 0.00001209 0.00000284 -0.0000071 -0.00000559" />
+        <joint name="${name}_right_finger_joint" limited="true" axis="-1 0 0" type="slide" range="${lower} ${upper}" />
+        <geom name="${name}_right_finger" type="mesh" mesh="wsg_gripper_finger_linkR" rgba="0. 0. 0. 1" />
+      </body>
+    </body>
+  </xacro:macro>
+
+  <xacro:macro name="pal_wsg_contacts_disable" params="name" >
+    <contact>
+      <exclude body1="${name}_left_finger_link" body2="${name}_right_finger_link" />
+    </contact>
+  </xacro:macro>
+</mujoco>
+

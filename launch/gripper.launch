@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<launch>
+
+  <!-- Robot Customization -->
+  <arg name="rviz"        default="true"  doc="Should rviz be spawned?" />
+
+  <!-- <arg name="mujoco_plugin_config" default="$(find pmb2_mujoco)/config/default_mjplugin_config.yaml"             doc="Location of param file containing the mujoco plugin config" /> -->
+
+  <!-- Needed for nesting this launchfile in test launchfiles -->
+  <arg name="headless" default="false" />
+  <arg name="unpause"  default="false" />
+  <arg name="no_x"     default="false" />
+  <arg name="verbose"  default="false" />
+  <arg name="xacro_outpath" default="/tmp/$(env USER)_wsg_test.xml" />
+
+  <arg name="start_controllers" default="false" />
+
+  <param name="/use_sim_time" value="true"/>
+
+  <param name="mujoco_xml"
+         command="xacro $(find pal_wsg_gripper_mujoco)/example/scene.xml.xacro 
+            -o $(arg xacro_outpath)"> <!-- hack writing xml to file instead of using rosparam because of MuJoCo Bug -->
+  </param>
+
+  <!-- <rosparam file="$(arg mujoco_plugin_config)" subst_value="true" /> -->
+
+  <include file="$(find mujoco_ros)/launch/launch_server.launch" pass_all_args="true" >
+    <arg name="modelfile" value="$(arg xacro_outpath)" />
+    <arg name="use_sim_time" value="true" />
+    <!-- Not working because of MuJoCo Bug, see hack above -->
+    <!-- <arg name="wait_for_xml" value="true" /> -->
+  </include>
+
+  <!-- <include if="$(arg start_controllers)" file="$(find pmb2_controller_configuration)/launch/default_controllers.launch" >
+    <arg name="robot_namespace" value="$(arg robot_namespace)" />
+  </include> -->
+</launch>
+
